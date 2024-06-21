@@ -1,13 +1,22 @@
-import React, { useState } from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import Row from './row';
-import { DndContext, DragOverlay, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { SortableContext, arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
-import styled from 'styled-components';
-import Item from './item';
-import Tray from './tray';
-import initialData from '.initial-data';
+import React, { useState } from "react";
+import Row from "./components/row";
+import {
+  DndContext,
+  DragOverlay,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  sortableKeyboardCoordinates,
+} from "@dnd-kit/sortable";
+import styled from "styled-components";
+import Item from "./components/item";
+import Tray from "./components/tray";
+import initialData from "./components/initial-data";
 
 const Container = styled.div`
   display: flex;
@@ -30,7 +39,7 @@ const TierList = (props) => {
     })
   );
 
-  const [data, setData] = useState(JSON.parse(initialData));
+  const [data, setData] = useState(initialData);
   const [activeId, setActiveId] = useState(null);
 
   const handleDragEnd = (event) => {
@@ -43,13 +52,17 @@ const TierList = (props) => {
 
     if (activeContainer && overContainer) {
       setData((prevData) => {
-        const activeItems = activeContainer === 'tray'
-          ? prevData.tray.items
-          : prevData.rows.find(row => row.id.toString() === activeContainer).items;
+        const activeItems =
+          activeContainer === "tray"
+            ? prevData.tray.items
+            : prevData.rows.find((row) => row.id.toString() === activeContainer)
+              .items;
 
-        const overItems = overContainer === 'tray'
-          ? prevData.tray.items
-          : prevData.rows.find(row => row.id.toString() === overContainer).items;
+        const overItems =
+          overContainer === "tray"
+            ? prevData.tray.items
+            : prevData.rows.find((row) => row.id.toString() === overContainer)
+              .items;
 
         const activeIndex = activeItems.indexOf(active.id);
         const overIndex = overItems.indexOf(over.id);
@@ -69,18 +82,16 @@ const TierList = (props) => {
         }
         let trayItems = prevData.tray.items;
 
-        if (activeContainer == 'tray') {
+        if (activeContainer == "tray") {
           trayItems = newActiveItems;
-        }
-
-        else if (overContainer == 'tray') {
+        } else if (overContainer == "tray") {
           trayItems = newOverItems;
         }
 
         return {
           ...prevData,
           tray: { items: trayItems },
-          rows: prevData.rows.map(row => {
+          rows: prevData.rows.map((row) => {
             if (row.id === activeContainer) {
               return { ...row, items: newActiveItems };
             }
@@ -89,25 +100,22 @@ const TierList = (props) => {
             }
 
             return row;
-          })
+          }),
         };
       });
     }
-
-    const dataInput = document.querySelector('input[name="data"]');
-    dataInput.value = JSON.stringify(data);
     setActiveId(null);
   };
 
   const findContainer = (id) => {
-    if (id.includes('tier-')) {
-      return data.rows.find(row => row.id.toString() === id).id;
+    if (id.includes("tier-")) {
+      return data.rows.find((row) => row.id.toString() === id).id;
     }
-    if (id == 'tray') {
-      return 'tray';
+    if (id == "tray") {
+      return "tray";
     }
     if (data.tray.items.includes(id)) {
-      return 'tray';
+      return "tray";
     }
     for (const row of data.rows) {
       if (row.items.includes(id.toString())) {
@@ -131,18 +139,25 @@ const TierList = (props) => {
     const activeContainer = findContainer(activeId);
     const overContainer = findContainer(overId);
 
-    if (!activeContainer || !overContainer || activeContainer === overContainer) {
+    if (
+      !activeContainer ||
+      !overContainer ||
+      activeContainer === overContainer
+    ) {
       return;
     }
 
     setData((prevData) => {
-      const activeItems = activeContainer === 'tray'
-        ? prevData.tray.items
-        : prevData.rows.find(row => row.id === activeContainer).items;
+      const activeItems =
+        activeContainer === "tray"
+          ? prevData.tray.items
+          : prevData.rows.find((row) => row.id === activeContainer).items;
 
-      const overItems = overContainer === 'tray'
-        ? prevData.tray.items
-        : prevData.rows.find(row => row.id.toString() === overContainer).items;
+      const overItems =
+        overContainer === "tray"
+          ? prevData.tray.items
+          : prevData.rows.find((row) => row.id.toString() === overContainer)
+            .items;
 
       const activeIndex = activeItems.indexOf(activeId);
       const overIndex = overItems.indexOf(overId);
@@ -161,37 +176,54 @@ const TierList = (props) => {
         newIndex = overIndex >= 0 ? overIndex + modifier : overItems.length + 1;
       }
 
-
-      if (activeContainer === 'tray') {
+      if (activeContainer === "tray") {
       }
       return {
         ...prevData,
-        tray: activeContainer === 'tray' ? {
-          items: [
-            ...prevData.tray.items.filter(item => item !== activeId),
-          ]
-        } : overContainer === 'tray' ? {
-          items: [...prevData.tray.items, activeId]
-        } : prevData.tray,
-        rows: prevData.rows.map(row => {
+        tray:
+          activeContainer === "tray"
+            ? {
+              items: [
+                ...prevData.tray.items.filter((item) => item !== activeId),
+              ],
+            }
+            : overContainer === "tray"
+              ? {
+                items: [...prevData.tray.items, activeId],
+              }
+              : prevData.tray,
+        rows: prevData.rows.map((row) => {
           if (row.id.toString() === activeContainer) {
             return {
-              ...row, items: [
-                ...prevData.rows.find(row => row.id.toString() === activeContainer).items.filter(item => item !== activeId),
-              ]
+              ...row,
+              items: [
+                ...prevData.rows
+                  .find((row) => row.id.toString() === activeContainer)
+                  .items.filter((item) => item !== activeId),
+              ],
             };
           }
           if (row.id.toString() === overContainer) {
             return {
-              ...row, items: [
-                ...prevData.rows.find(row => row.id.toString() == overContainer).items.slice(0, newIndex),
+              ...row,
+              items: [
+                ...prevData.rows
+                  .find((row) => row.id.toString() == overContainer)
+                  .items.slice(0, newIndex),
                 activeId,
-                ...prevData.rows.find(row => row.id.toString() == overContainer).items.slice(newIndex, prevData.rows.find(row => row.id.toString() === overContainer).items.length),
-              ]
+                ...prevData.rows
+                  .find((row) => row.id.toString() == overContainer)
+                  .items.slice(
+                    newIndex,
+                    prevData.rows.find(
+                      (row) => row.id.toString() === overContainer
+                    ).items.length
+                  ),
+              ],
             };
           }
           return row;
-        })
+        }),
       };
     });
   };
@@ -210,18 +242,36 @@ const TierList = (props) => {
           <SortableContext items={data.rows}>
             {data.rows.map((row) => {
               const rowItems = row.items.map((item) => data.items[item]);
-              return <Row key={row.id} id={row.id} name={row.name} color={row.color} items={rowItems} disabled={props.disabled} />;
+              return (
+                <Row
+                  key={row.id}
+                  id={row.id}
+                  name={row.name}
+                  color={row.color}
+                  items={rowItems}
+                  disabled={props.disabled}
+                />
+              );
             })}
           </SortableContext>
         </Container>
-        <SortableContext items={data.tray.items.map(item => data.items[item])}>
-          <Tray key="tray" id="tray" items={data.tray.items.map(item => data.items[item])} disabled={props.disabled}></Tray>
+        <SortableContext
+          items={data.tray.items.map((item) => data.items[item])}
+        >
+          <Tray
+            key="tray"
+            id="tray"
+            items={data.tray.items.map((item) => data.items[item])}
+            disabled={props.disabled}
+          ></Tray>
         </SortableContext>
         <DragOverlay>
-          {props.disabled?.trim() != 'true' && activeId ? <Item id={activeId} path={data.items[activeId].path} /> : null}
+          {props.disabled?.trim() != "true" && activeId ? (
+            <Item id={activeId} path={data.items[activeId].path} />
+          ) : null}
         </DragOverlay>
       </DndContext>
-    </div >
+    </div>
   );
 };
 

@@ -1,8 +1,13 @@
-if (document.getElementById('tierlist')) {
-    const Index = ReactDOM.createRoot(document.getElementById("tierlist"));
-    Index.render(
-        <StrictMode>
-            <TierList initialData={data} disabled={disabled} />
-        </StrictMode>
-    );
-}
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+
+import TierList from "./TierList";
+
+const rootElement = document.getElementById("root");
+const root = createRoot(rootElement);
+
+root.render(
+  <StrictMode>
+    <TierList />
+  </StrictMode>
+);
